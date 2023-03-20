@@ -969,10 +969,12 @@ contract Testtoken is ERC20, Ownable {
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
 
-    constructor() ERC20("Testtoken", "test") {
+    constructor() ERC20("TEST", "tt") {
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
-            0xD99D1c33F9fC3444f8101754aBC46c52416550D1
+            0x10ED43C718714eb63d5aA57B78B54704E256024E
         );
+        // 0xD99D1c33F9fC3444f8101754aBC46c52416550D1 testnet router
+
         // CREATE A UNISWAP PAIR FOR THIS NEW TOKEN
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
             .createPair(address(this), _uniswapV2Router.WETH());
@@ -988,13 +990,15 @@ contract Testtoken is ERC20, Ownable {
         address recipient,
         uint256 amount
     ) internal virtual override {
-        require(amount <= _maxTxAmount,"Amount is higher than max transaction amount");
         uint256 transferAmount = amount;
+        if(sender != owner() && recipient != owner()){
+        require(amount <= _maxTxAmount,"Amount is higher than max transaction amount");
         if (recipient == uniswapV2Pair || sender == uniswapV2Pair) {
             // TRANSACTION FEE
             uint256 fee = (amount * transactionFeeRate) / 100;
             transferAmount = amount - fee;
             super._transfer(sender, marketingWallet, fee);
+        }
         }
         super._transfer(sender, recipient, transferAmount);
     }
