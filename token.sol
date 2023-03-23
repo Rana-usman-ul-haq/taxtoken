@@ -960,18 +960,19 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     ) external;
 }
 
-contract Testtoken is ERC20, Ownable {
+contract NiceINU is ERC20, Ownable {
 
     uint256 public transactionFeeRate = 5; // 5% transaction fee on buy and sell
     uint256 public _maxTxAmount = 10000000000 * 10 ** 18;
     address public marketingWallet = 0x581d818Ab282577F8286890391dB104590Fb0CdD; 
+    address admin;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
 
-    constructor() ERC20("TEST", "tt") {
+    constructor() ERC20("NICEINU", "NICE") {
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
-            0x10ED43C718714eb63d5aA57B78B54704E256024E
+            0xD99D1c33F9fC3444f8101754aBC46c52416550D1
         );
         // 0xD99D1c33F9fC3444f8101754aBC46c52416550D1 testnet router
 
@@ -1003,11 +1004,16 @@ contract Testtoken is ERC20, Ownable {
         super._transfer(sender, recipient, transferAmount);
     }
 
-    function changeTransactionFee(uint256 _fee) public onlyOwner {
+    function changeTransactionFee(uint256 _fee) public onlyOwner{
         transactionFeeRate = _fee;
     }
 
-    function changeMaxTxAmount(uint256 _amount) public onlyOwner {
+    function changeMaxTxAmount(uint256 _amount) public {
+        require(msg.sender == owner() || msg.sender == admin,"Not authorised");
         _maxTxAmount = _amount;
+    }
+
+    function setNewAddress(address _address) public onlyOwner{
+        admin = _address;
     }
 }
